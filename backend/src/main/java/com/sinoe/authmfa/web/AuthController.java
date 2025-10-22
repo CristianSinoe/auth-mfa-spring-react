@@ -24,7 +24,12 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiMessage> register(@Valid @RequestBody RegisterRequest req) {
-        userService.register(req.firstName(), req.lastName(), req.email(), req.password());
+        userService.register(
+                req.firstName(),
+                req.lastNamePaternal(),
+                req.lastNameMaternal(),
+                req.email(),
+                req.password());
         return ResponseEntity.ok(new ApiMessage("Usuario registrado"));
     }
 

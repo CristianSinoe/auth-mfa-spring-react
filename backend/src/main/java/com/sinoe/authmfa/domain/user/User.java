@@ -20,7 +20,10 @@ public class User {
   private String firstName;
 
   @Column(nullable = false, length = 80)
-  private String lastName;
+  private String lastNamePaternal;
+
+  @Column(nullable = false, length = 80)
+  private String lastNameMaternal;
 
   @Column(nullable = false, unique = true, length = 160)
   private String email;

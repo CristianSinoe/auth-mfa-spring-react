@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -15,14 +16,16 @@ public class UserService {
   private final UserRepository userRepository;
   private final BCryptPasswordEncoder encoder;
 
-  public User register(String first, String last, String email, String rawPassword) {
-    if (userRepository.existsByEmail(email)) {
+  public User register(String first, String lastPat, String lastMat, String email, String rawPassword) {
+    String emailNorm = email.toLowerCase(Locale.ROOT);
+    if (userRepository.existsByEmail(emailNorm)) {
       throw new IllegalStateException("Email ya registrado");
     }
     User u = User.builder()
         .firstName(first)
-        .lastName(last)
-        .email(email.toLowerCase())
+        .lastNamePaternal(lastPat)
+        .lastNameMaternal(lastMat)
+        .email(emailNorm)
         .passwordHash(encoder.encode(rawPassword))
         .enabled(true)
         .build();
@@ -30,7 +33,7 @@ public class UserService {
   }
 
   public Optional<User> findByEmail(String email) {
-    return userRepository.findByEmail(email.toLowerCase());
+    return userRepository.findByEmail(email.toLowerCase(Locale.ROOT));
   }
 
   public boolean checkPassword(User u, String raw) {
