@@ -1,0 +1,22 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Java / Maven
+target/
+*.log
+
+# Node
+node_modules/
+dist/
+.build/
+.cache/
+
+# Env
+.env
+*.tmp
