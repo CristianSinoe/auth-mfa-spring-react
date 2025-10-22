@@ -63,7 +63,7 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<ApiMessage> me(java.security.Principal principal) {
-        String email = principal.getName(); // viene del JWT (subject)
+        String email = principal.getName();
         return ResponseEntity.ok(new ApiMessage("Hola, " + email));
     }
 

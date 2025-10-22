@@ -1,36 +1,81 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { apiLogin } from '../api'
+import { useState } from "react";
+import { loginUser } from "../api";
+import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [msg, setMsg] = useState('')
-  const navigate = useNavigate()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   async function onSubmit(e) {
-    e.preventDefault()
-    setMsg('')
+    e.preventDefault();
+    setMsg("");
+    setLoading(true);
     try {
-      await apiLogin({ email, password })
-      // Guardamos el email para la pantalla de OTP
-      sessionStorage.setItem('otp_email', email)
-      navigate('/verify-otp')
+      await loginUser({ email, password });
+      navigate("/verify-otp", { state: { email } });
     } catch (err) {
-      setMsg(err.message)
+      setMsg(err.message || "Error al iniciar sesión");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={onSubmit} style={{display:'grid', gap:8, maxWidth:360}}>
-        <input type="email" placeholder="Correo" value={email} onChange={e=>setEmail(e.target.value)} required />
-        <input type="password" placeholder="Contraseña" value={password} onChange={e=>setPassword(e.target.value)} required />
-        <button>Entrar</button>
-      </form>
-      {msg && <p style={{marginTop:12}}>{msg}</p>}
-      <p style={{marginTop:12, fontSize:13}}>Después de este paso recibirás un código OTP por correo.</p>
+    <div className="glitch-form-wrapper cyber-theme">
+      {loading && (
+        <div className="loader-overlay">
+          <Loader />
+        </div>
+      )}
+
+      <div className="glitch-card" style={{ width: "100%", maxWidth: 420 }}>
+        <div className="card-header">
+          <div className="card-title">INICIAR SESIÓN</div>
+          <div className="card-dots">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <div className="card-body">
+          <form onSubmit={onSubmit}>
+            <div className="form-group">
+              <input
+                type="email"
+                placeholder=" "
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <label className="form-label" data-text="Correo electrónico">
+                Correo electrónico
+              </label>
+            </div>
+
+            <div className="form-group">
+              <input
+                type="password"
+                placeholder=" "
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <label className="form-label" data-text="Contraseña">
+                Contraseña
+              </label>
+            </div>
+
+            <button className="submit-btn neon-btn" data-text="Entrar">
+              <span className="btn-text">Entrar</span>
+            </button>
+          </form>
+
+          {msg && <p style={{ marginTop: 12, color: "#f88" }}>{msg}</p>}
+        </div>
+      </div>
     </div>
-  )
+  );
 }

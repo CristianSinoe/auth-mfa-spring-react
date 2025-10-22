@@ -22,25 +22,48 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   private final JwtService jwtService;
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+  protected void doFilterInternal(HttpServletRequest request,
+      HttpServletResponse response,
+      FilterChain chain)
       throws ServletException, IOException {
+
+    if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+      chain.doFilter(request, response);
+      return;
+    }
+
+    String path = request.getRequestURI();
+    if (path.startsWith("/api/auth/") &&
+        (path.endsWith("/login") || path.endsWith("/register") || path.endsWith("/verify-otp"))) {
+      chain.doFilter(request, response);
+      return;
+    }
 
     String header = request.getHeader(HttpHeaders.AUTHORIZATION);
     if (header != null && header.startsWith("Bearer ")) {
       String token = header.substring(7);
       try {
         String subject = jwtService.parseSubject(token);
+
         var auth = new AbstractAuthenticationToken(AuthorityUtils.NO_AUTHORITIES) {
-          @Override public Object getCredentials() { return token; }
-          @Override public Object getPrincipal() { return subject; }
+          @Override
+          public Object getCredentials() {
+            return token;
+          }
+
+          @Override
+          public Object getPrincipal() {
+            return subject;
+          }
         };
         auth.setAuthenticated(true);
         SecurityContextHolder.getContext().setAuthentication(auth);
+
       } catch (Exception e) {
-        // Token inválido: limpiamos el contexto y seguimos; caerá en 401 si el endpoint requiere auth
         SecurityContextHolder.clearContext();
       }
     }
+
     chain.doFilter(request, response);
   }
 }

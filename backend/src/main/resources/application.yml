@@ -29,7 +29,7 @@ logging:
 app:
   jwt:
     secret: ${JWT_SECRET}
-    exp-minutes: ${JWT_EXP_MINUTES:60}
+    exp-minutes: ${JWT_EXP_MINUTES:5}
   otp:
     exp-minutes: ${OTP_EXP_MINUTES:5}
     max-attempts: ${OTP_MAX_ATTEMPTS:5}
