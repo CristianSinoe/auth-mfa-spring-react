@@ -7,9 +7,43 @@ export async function registerUser({ firstName, lastNamePaternal, lastNameMatern
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ firstName, lastNamePaternal, lastNameMaternal, email, password }),
   });
-  const payload = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(payload.message || "Error en registro");
-  return payload;
+
+  // intenta leer JSON; si no es JSON, cae a texto
+  let payload = null;
+  let rawText = "";
+  try {
+    payload = await res.json();
+  } catch {
+    try {
+      rawText = await res.text();
+    } catch {
+      rawText = "";
+    }
+  }
+
+  if (!res.ok) {
+    // 1) Caso ideal: el backend manda 409 Conflict
+    if (res.status === 403) {
+      throw new Error("El correo ya está registrado. Usa otro o inicia sesión.");
+    }
+
+    // 2) Mensajes típicos del backend/BD (por si llega como 400/500)
+    const msg = (payload && (payload.message || payload.error)) || rawText || "";
+
+    // Heurísticas por si viene desde Postgres/Hibernate
+    const looksLikeUniqueEmail =
+      /duplicate key|unique constraint|uk6dotkott|already exists|23505/i.test(msg) ||
+      (/email/i.test(msg) && /exists|registrad/i.test(msg));
+
+    if (looksLikeUniqueEmail) {
+      throw new Error("El correo ya está registrado. Usa otro o inicia sesión.");
+    }
+
+    // 3) Fallback genérico
+    throw new Error(msg || "Error en registro");
+  }
+
+  return payload ?? {};
 }
 
 export async function loginUser({ email, password }) {
