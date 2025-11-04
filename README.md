@@ -210,16 +210,4 @@ auth-mfa-spring-react/
 **Cristian Sinoe Hernández Ruiz**  
 _Universidad Veracruzana — Ingeniería de Software_  
 Práctica: *Autenticación Multifactor (MFA) con Spring Boot y React*  
-Materia: **Diseño e Ingeniería de Software**
-
----
-
-## Futuras mejoras
-- Envío de OTP por SMS (Twilio)
-- Expiración automática del código
-- Panel de administración para usuarios
-
----
-
-## Licencia
-Proyecto de uso educativo — libre distribución con fines académicos.
+Materia: **Aspectos de Seguridad**
